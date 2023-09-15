@@ -59,7 +59,7 @@ jobs:
         username: ${{ secrets.DEV_SSH_USER }}
         key: ${{ secrets.DEV_SSH_KEY }}
         port: ${{ secrets.DEV_SSH_PORT }}
-        source: ${{ env.ARTIFACT_NAME }}
+        source: /tmp/${{ env.ARTIFACT_NAME }}
         target: ${{ secrets.DEV_SERVER_PATH }}
 
     - name: Extract Artifact
