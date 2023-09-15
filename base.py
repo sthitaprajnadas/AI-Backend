@@ -13,7 +13,7 @@ revoked_token_list = set()
 app = Flask(__name__, static_folder="templates/static", template_folder="templates")
 
 jwt_manager = JWTManager(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://abproto1:abpr0t01@ab-proto-1.cluster-cunq64theuzf.us-east-2.rds.amazonaws.com:3306/ab-proto1'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://abproto1:abpr0t01@ab-proto-1.cluster-cunq64theuzf.us-east-2.rds.amazonaws.com:3306/ab-proto1'
 app.config.from_object('config.Config')
 db.init_app(app)
 
