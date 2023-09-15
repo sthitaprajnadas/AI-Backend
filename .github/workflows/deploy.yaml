@@ -27,7 +27,9 @@ jobs:
       env:
         GITHUB_SHA: ${{ github.sha }}
       #run: tar -czf "${GITHUB_SHA}"-dist.tar.gz ./dist/
-      run: tar -czf ${{ env.ARTIFACT_NAME }} .
+      run: |
+      touch {{ env.ARTIFACT_NAME }}
+      tar --exclude='dist' --exclude=${{ env.ARTIFACT_NAME }}  -czf ${{ env.ARTIFACT_NAME }} .
 
     - name: Store artifact for distribution
       uses: actions/upload-artifact@v3
