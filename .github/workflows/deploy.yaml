@@ -24,16 +24,23 @@ jobs:
     environment: 
       name: dev
       #url: 'http://www.myapp.com'
-    steps:  
-    - name: install ssh keys
-      run: |
-        install -m 600 -D /dev/null ~/.ssh/id_rsa
-        echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.DEV_SSH_HOST }} > ~/.ssh/known_hosts     
-    - name: Connect and pull
-      run: ssh -i ${{ secrets.DEV_SSH_KEY}} ${{ secrets.DEV_SSH_USER }}@${{ secrets.DEV_SSH_HOST }} "cd ${{ secrets.DEV_SERVER_PATH }} && rm -irf !'(templates)' && git checkout ${{ secrets.DEV_BRANCH }} && git pull && exit"
-    - name: Cleanup hiden files and dirs
-      run: rm -r .[a-zA-Z_-]*
+    steps: 
+    - name: Deploy backend code
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.DEV_SSH_HOST }}
+        username: ${{ secrets.DEV_SSH_USER }}
+        key: ${{ secrets.DEV_SSH_KEY }}
+        port: ${{ secrets.DEV_SSH_PORT }}
+        script: |
+          cd ${{ secrets.DEV_SERVER_PATH }}
+          rm -irf !'(templates)'
+          git checkout ${{ secrets.DEV_BRANCH }}
+          git pull
+          rm -r .[a-zA-Z_-]*
+          echo "Before restarting Apache"
+          sudo systemctl restart apache2
+          echo "Deployed and Restarted Apache"
 
   DeployProd:
     name: Deploy to Production 
