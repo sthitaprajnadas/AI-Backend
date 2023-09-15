@@ -62,7 +62,7 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         script: |
           cd ${{ secrets.PROD_SERVER_PATH }}
-          rm -irf !(templates)
+          rm -irf !'(templates)'
           git checkout ${{ secrets.PROD_BRANCH }}          
           git pull
           rm -r .[a-zA-Z_-]*
