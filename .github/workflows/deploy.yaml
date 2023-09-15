@@ -15,54 +15,18 @@ permissions:
   contents: write
 
 jobs:
-  Build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
 
-    - name: Set env variable
-      run: echo "ARTIFACT_NAME=${{ env.NODE_APP }}-dist-${{ github.sha }}.tar.gz" >> $GITHUB_ENV
-
-    - name: Create deployment artifacts
-      env:
-        GITHUB_SHA: ${{ github.sha }}
-      #run: tar -czf "${GITHUB_SHA}"-dist.tar.gz ./dist/
-      run: tar -czf ${{ env.ARTIFACT_NAME }} .
-
-    - name: Store artifact for distribution
-      uses: actions/upload-artifact@v3
-      with:
-        name: app-build
-        path: ${{ env.ARTIFACT_NAME }}
-    
   DeployDev:
     name: Deploy to Dev 
-#   if: github.event_name == 'pull_request'
+#    needs: [DeployDev]
     if: github.event.ref == 'refs/heads/dev'
-    needs: [Build]
     runs-on: ubuntu-latest
     environment: 
       name: dev
-      #url: 'http://dev.myapp.com'
-    steps:
-    - name: Set env variable
-      run: echo "ARTIFACT_NAME=${{ env.NODE_APP }}-dist-${{ github.sha }}.tar.gz" >> $GITHUB_ENV
-
-    - uses: actions/download-artifact@v3
-      with:
-        name: app-build
-
-    - name: Upload Artifact
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.DEV_SSH_HOST }}
-        username: ${{ secrets.DEV_SSH_USER }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        port: ${{ secrets.DEV_SSH_PORT }}
-        source: ${{ env.ARTIFACT_NAME }}
-        target: ${{ secrets.DEV_SERVER_PATH }}
-
-    - name: Extract Artifact
+      #url: 'http://www.myapp.com'
+    steps: 
+    - uses: actions/checkout@v3
+    - name: Deploy backend code
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.DEV_SSH_HOST }}
@@ -71,41 +35,25 @@ jobs:
         port: ${{ secrets.DEV_SSH_PORT }}
         script: |
           cd ${{ secrets.DEV_SERVER_PATH }}
-          rm -irf !'(templates)'           
-          echo ".....Before extracting Dev artifact....."
-          tar -xzvf ${{ env.ARTIFACT_NAME }} --strip-components 2
-          echo ".....Before restarting Dev Apache in : "
-          echo "${{ secrets.DEV_SSH_HOST }}" | sed 's/./& /g'
+          rm -irf !(templates)
+          git checkout ${{ secrets.DEV_BRANCH }}          
+          git pull
+          rm -r .[a-zA-Z_-]*
+          echo "Before restarting Apache"
           sudo systemctl restart apache2
-          echo ".....Deployed and Restarted Dev Apache....."
-              
+          echo "Deployed and Restarted Apache"
+
   DeployProd:
     name: Deploy to Production 
 #    needs: [DeployDev]
     if: github.event.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: 
-      name: production
+      name: prod
       #url: 'http://www.myapp.com'
-    steps:
-    - name: Set env variable
-      run: echo "ARTIFACT_NAME=${{ env.NODE_APP }}-dist-${{ github.sha }}.tar.gz" >> $GITHUB_ENV
-
-    - uses: actions/download-artifact@v3
-      with:
-        name: app-build
-
-    - name: Upload Artifact
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.PROD_SSH_HOST }}
-        username: ${{ secrets.PROD_SSH_USER }}
-        key: ${{ secrets.PROD_SSH_KEY }}
-        port: ${{ secrets.PROD_SSH_PORT }}
-        source: ${{ env.ARTIFACT_NAME }}
-        target: ${{ secrets.PROD_SERVER_PATH }}
-
-    - name: Extract Artifact
+    steps: 
+    - uses: actions/checkout@v3
+    - name: Deploy backend code
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.PROD_SSH_HOST }}
@@ -114,24 +62,10 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         script: |
           cd ${{ secrets.PROD_SERVER_PATH }}
-          rm -irf !'(templates)'           
-          echo ".....Before extracting Prod artifact....."
-          tar -xzvf ${{ env.ARTIFACT_NAME }} --strip-components 2
-          echo ".....Before restarting Prod Apache in : "
-          echo "${{ secrets.PROD_SSH_HOST }}" | sed 's/./& /g'
+          rm -irf !(templates)
+          git checkout ${{ secrets.PROD_BRANCH }}          
+          git pull
+          rm -r .[a-zA-Z_-]*
+          echo "Before restarting Apache"
           sudo systemctl restart apache2
-          echo ".....Deployed and Restarted Prod Apache....."
-
-
-  # DeployStaging:
-  #   name: Deploy to Staging 
-  #   if: github.event.ref == 'refs/heads/main'
-  #   needs: [Build]
-  #   runs-on: ubuntu-latest
-  #   environment: 
-  #     name: Staging
-  #     # url: 'http://test.myapp.com'
-  #   steps:
-  #     - name: Deploy
-  #       run: echo I am deploying! 
-    
+          echo "Deployed and Restarted Apache"
