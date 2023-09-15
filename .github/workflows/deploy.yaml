@@ -24,7 +24,14 @@ jobs:
     environment: 
       name: dev
       #url: 'http://www.myapp.com'
-    steps:       
+    steps:  
+      - name: install ssh keys
+      # check this thread to understand why its needed:
+      # https://stackoverflow.com/a/70447517
+      run: |
+        install -m 600 -D /dev/null ~/.ssh/id_rsa
+        echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.DEV_SSH_HOST }} > ~/.ssh/known_hosts     
     - name: Connect and pull
       run: ssh -i ${{ secrets.DEV_SSH_KEY}} ${{ secrets.DEV_SSH_USER }}@${{ secrets.DEV_SSH_HOST }} "cd ${{ secrets.DEV_SERVER_PATH }} && rm -irf !'(templates)' && git checkout ${{ secrets.DEV_BRANCH }} && git pull && exit"
     - name: Cleanup hiden files and dirs
