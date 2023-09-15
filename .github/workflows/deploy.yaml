@@ -25,6 +25,7 @@ jobs:
       name: dev
       #url: 'http://www.myapp.com'
     steps: 
+    - uses: actions/checkout@v3
     - name: Deploy backend code
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -34,9 +35,10 @@ jobs:
         port: ${{ secrets.DEV_SSH_PORT }}
         script: |
           cd ${{ secrets.DEV_SERVER_PATH }}
-          rm -irf !'(templates)'
-          git checkout ${{ secrets.DEV_BRANCH }}
+          rm -irf !(templates)
+          
           git pull
+          git checkout ${{ secrets.DEV_BRANCH }}
           rm -r .[a-zA-Z_-]*
           echo "Before restarting Apache"
           sudo systemctl restart apache2
