@@ -27,13 +27,13 @@ jobs:
       env:
         GITHUB_SHA: ${{ github.sha }}
       #run: tar -czf "${GITHUB_SHA}"-dist.tar.gz ./dist/
-      run: tar  -czf /tmp/${{ env.ARTIFACT_NAME }} .
+      run: tar  -czf /var/${{ env.ARTIFACT_NAME }} .
 
     - name: Store artifact for distribution
       uses: actions/upload-artifact@v3
       with:
         name: app-build
-        path: /tmp/${{ env.ARTIFACT_NAME }}
+        path: /var/${{ env.ARTIFACT_NAME }}
     
   DeployDev:
     name: Deploy to Dev 
@@ -59,7 +59,7 @@ jobs:
         username: ${{ secrets.DEV_SSH_USER }}
         key: ${{ secrets.DEV_SSH_KEY }}
         port: ${{ secrets.DEV_SSH_PORT }}
-        source: /tmp/${{ env.ARTIFACT_NAME }}
+        source: /var/${{ env.ARTIFACT_NAME }}
         target: ${{ secrets.DEV_SERVER_PATH }}
 
     - name: Extract Artifact
