@@ -23,13 +23,17 @@ jobs:
     - name: Set env variable
       run: echo "ARTIFACT_NAME=${{ env.NODE_APP }}-dist-${{ github.sha }}.tar.gz" >> $GITHUB_ENV
 
-    - name: Create deployment artifacts
+    - name: Create artifact file
       env:
         GITHUB_SHA: ${{ github.sha }}
       #run: tar -czf "${GITHUB_SHA}"-dist.tar.gz ./dist/
-      run: |
-      touch {{ env.ARTIFACT_NAME }}
-      tar --exclude='dist' --exclude=${{ env.ARTIFACT_NAME }}  -czf ${{ env.ARTIFACT_NAME }} .
+      run: touch {{ env.ARTIFACT_NAME }}
+
+    - name: Archive for artifacts
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+      #run: tar -czf "${GITHUB_SHA}"-dist.tar.gz ./dist/
+      run: tar --exclude='dist' --exclude=${{ env.ARTIFACT_NAME }}  -czf ${{ env.ARTIFACT_NAME }} .
 
     - name: Store artifact for distribution
       uses: actions/upload-artifact@v3
