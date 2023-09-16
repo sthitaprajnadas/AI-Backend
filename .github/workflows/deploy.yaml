@@ -35,9 +35,10 @@ jobs:
         port: ${{ secrets.DEV_SSH_PORT }}
         script: |
           cd ${{ secrets.DEV_SERVER_PATH }}
-          rm -irf !(templates)
-          git checkout ${{ secrets.DEV_BRANCH }}          
-          git pull
+          rm -irf !'(templates)'
+          git init
+          echo "git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}"
+          git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
           rm -r .[a-zA-Z_-]*
           echo "Before restarting Apache"
           sudo systemctl restart apache2
@@ -53,6 +54,8 @@ jobs:
       #url: 'http://www.myapp.com'
     steps: 
     - uses: actions/checkout@v3
+      with:
+        ref: ${{ secrets.PROD_BRANCH }}
     - name: Deploy backend code
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -62,10 +65,12 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         script: |
           cd ${{ secrets.PROD_SERVER_PATH }}
-          rm -irf !(templates)
-          git checkout ${{ secrets.PROD_BRANCH }}          
-          git pull
+          rm -irf !'(templates)'
+          git init
+          echo "git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}"
+          git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
           rm -r .[a-zA-Z_-]*
           echo "Before restarting Apache"
           sudo systemctl restart apache2
           echo "Deployed and Restarted Apache"
+
