@@ -3,29 +3,26 @@ name: Proto1-Backend
 on:
   push:
     branches: [ main,dev ]
-  # pull_request:
-  #   branches: [ main,dev ]
   workflow_dispatch:
 
 env:
   NODE_VERSION: '16.x'
-  NODE_APP: 'proto1-backend'                # set this to the node version to use
+  NODE_APP: 'Proto1-Backend'                # set this to the node version to use
 
 permissions:
   contents: write
 
 jobs:
-
   DeployDev:
     name: Deploy to Dev 
-#    needs: [DeployDev]
     if: github.event.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     environment: 
       name: dev
-      #url: 'http://www.myapp.com'
     steps: 
     - uses: actions/checkout@v3
+      with:
+        ref: ${{ secrets.DEV_BRANCH }}
     - name: Deploy backend code
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -37,21 +34,20 @@ jobs:
           cd ${{ secrets.DEV_SERVER_PATH }}
           rm -irf !'(templates)'
           git init
-          echo "git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}"
-          git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
+          echo "git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}"
+          git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}
           rm -r .[a-zA-Z_-]*
           echo "Before restarting Apache"
           sudo systemctl restart apache2
           echo "Deployed and Restarted Apache"
 
+
   DeployProd:
     name: Deploy to Production 
-#    needs: [DeployDev]
     if: github.event.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: 
       name: prod
-      #url: 'http://www.myapp.com'
     steps: 
     - uses: actions/checkout@v3
       with:
