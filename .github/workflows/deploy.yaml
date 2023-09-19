@@ -33,8 +33,8 @@ jobs:
           cd ${{ secrets.DEV_SERVER_PATH }}
           rm -irf !'(templates)'
           git init
-          echo "git pull https://${{secrets.GIT_PAT}}@$github.com/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}"
-          git pull https://${{secrets.GIT_PAT}}@${github.com/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}
+          echo "git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}"
+          git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}
           rm -r .[a-zA-Z_-]*
           echo "Before restarting Apache"
           sudo systemctl restart apache2
@@ -63,7 +63,7 @@ jobs:
           rm -irf !'(templates)'
           git init
           echo "git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}"
-          git pull https://${{secrets.GIT_PAT}}@$github.com/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
+          git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
           rm -r .git
           echo "Before restarting Apache"
           sudo systemctl restart apache2
