@@ -33,6 +33,7 @@ jobs:
           cd ${{ secrets.DEV_SERVER_PATH }}
           rm -irf !'(templates)'
           git init
+          git config --global init.defaultBranch ${{ secrets.DEV_BRANCH }}
           echo "git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}"
           git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.DEV_BRANCH }}
           rm -r .[a-zA-Z_-]*
@@ -62,9 +63,10 @@ jobs:
           cd ${{ secrets.PROD_SERVER_PATH }}
           rm -irf !'(templates)'
           git init
+          git config --global init.defaultBranch ${{ secrets.PROD_BRANCH }}
           echo "git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}"
           git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
-          rm -r .git
+          rm -r .git .github
           echo "Before restarting Apache"
           sudo systemctl restart apache2
           echo "Deployed and Restarted Apache"
