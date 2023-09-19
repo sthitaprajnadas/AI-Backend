@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '16.x'
-  NODE_APP: 'Proto1-Backend'                # set this to the node version to use
+  NODE_VERSION: '16.x'                # set this to the node version to use
+  NODE_APP: 'Proto1-Backend'                
 
 permissions:
   contents: write
