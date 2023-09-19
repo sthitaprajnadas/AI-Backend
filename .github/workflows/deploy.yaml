@@ -61,11 +61,9 @@ jobs:
         script: |
           cd ${{ secrets.PROD_SERVER_PATH }}
           rm -irf !'(templates)'
-          git init
-          echo "git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}"
-          git pull https://${{secrets.GIT_PAT}}@${{ github.server_url }}/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
-          rm -r .git
           echo "Before restarting Apache"
           sudo systemctl restart apache2
           echo "Deployed and Restarted Apache"
+
+
 
