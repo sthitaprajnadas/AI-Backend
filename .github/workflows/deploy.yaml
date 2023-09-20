@@ -61,14 +61,15 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         script: |
           cd ${{ secrets.PROD_SERVER_PATH }}
-          echo "before removing old files"          
+          echo "before removing old files"        
+          mv templates ../  
           rm -rf .git*
-          rm -irf !"(templates)"
           echo "after removing old files"
           git init
           git config --global --add safe.directory ${{ secrets.PROD_SERVER_PATH }}
           echo "git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}"
           git pull https://${{secrets.GIT_PAT}}@github.com/${{ github.repository }}.git ${{ secrets.PROD_BRANCH }}
+          mv ../templates .
           rm -rf .git*
           echo "Before restarting Prod Apache"
           sudo systemctl restart apache2
