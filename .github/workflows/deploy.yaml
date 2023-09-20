@@ -61,7 +61,7 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         script: |
           cd ${{ secrets.PROD_SERVER_PATH }}
-          rm -irf !'(templates)'
+          rm -rf !(templates)
           rm -rf .git*
           git init
           git config --global --add safe.directory ${{ secrets.PROD_SERVER_PATH }}
